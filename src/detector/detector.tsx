@@ -4,14 +4,18 @@ import * as tf from '@tensorflow/tfjs'
 
 let model:tf.GraphModel;
 
-const classes = [
+const types = [
   {
-    name: 'mercedes',
+    name: 'škoda',
     id: 1,
   },
   {
-    name: 'škoda',
+    name: 'volkswagen',
     id: 2,
+  },
+  {
+    name: 'toyota',
+    id: 3,
   },
 ];
 
@@ -67,30 +71,29 @@ const Detector = () => {
       image.onload = async function() {
         let tensor = tf.browser.fromPixels(imageRef.current!).expandDims(0);//.reshape([1, imageRef.current!.width, imageRef.current!.height, 3]);
         tf.engine().startScope();
-        let result = (await model.executeAsync(tensor, [ 'detection_boxes','detection_multiclass_scores']) as tf.Tensor[]);
+        let result = (await model.executeAsync(tensor, [ 'Identity_1:0','Identity_4:0','Identity_2:0']) as tf.Tensor[]);
         const boxes = result[0].arraySync() as number[][][];
-        const scores = result[1].arraySync() as number[][][];
+        const scores = result[1].arraySync() as number[][];
+        const classes = result[2].arraySync() as number[][];
 
         let detectedObjects:Prediction[] = [];
 
         scores[0].forEach((score, i) => {
-          for (let type of classes) {
-            if (score[type.id] > 0.8) {
-              const bbox = [];
-              const minY = boxes[0][i][0] * imageRef.current!.height;
-              const minX = boxes[0][i][1] * imageRef.current!.width;
-              const maxY = boxes[0][i][2] * imageRef.current!.height;
-              const maxX = boxes[0][i][3] * imageRef.current!.width;
-              bbox[0] = minX;
-              bbox[1] = minY;
-              bbox[2] = maxX - minX;
-              bbox[3] = maxY - minY;
-              detectedObjects.push({
-                box: bbox,
-                type: type.name,
-                score: score[type.id],
-               })
-            }
+          if (score > 0.7) {
+            const bbox = [];
+            const minY = boxes[0][i][0] * imageRef.current!.height;
+            const minX = boxes[0][i][1] * imageRef.current!.width;
+            const maxY = boxes[0][i][2] * imageRef.current!.height;
+            const maxX = boxes[0][i][3] * imageRef.current!.width;
+            bbox[0] = minX;
+            bbox[1] = minY;
+            bbox[2] = maxX - minX;
+            bbox[3] = maxY - minY;
+            detectedObjects.push({
+              box: bbox,
+              type: types.map((f) => f.name)[classes[0][i]-1],
+              score: score,
+             })
           }
         })
 
