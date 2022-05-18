@@ -106,6 +106,7 @@ const Detector = () => {
   if (isInitialized) {
     return (
       <div>
+        <div className={'headline'}>Custom Škoda, VW and Toyota Logo Detection model</div>
         <input className={'input'} type='file' accept={'image/*'} multiple={false} onChange={(e) => fileLoaded(e)}/>
         <div className={'wrapper'}>
           <img ref={imageRef} width={1000}></img>
