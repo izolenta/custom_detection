@@ -42,7 +42,7 @@ const Detector = () => {
     let nodes = [];
     for (let next of boundingData) {
       let positionFrame = {left: next.box[0]+'px', top: next.box[1]+'px', width: next.box[2]+'px', height: next.box[3]+'px'};
-      let positionHeader = {left: next.box[0]+'px', top: next.box[1]+'px'};
+      let positionHeader = {left: next.box[0]+'px', top: (next.box[1]-60)+'px'};
       let box = <div className={'positioned'} style={positionFrame}></div>;
       let header = <div className={'header'} style={positionHeader}>{next.type} {next.score.toFixed(2)}</div>;
       nodes.push(box);
